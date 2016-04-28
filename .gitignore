@@ -1,0 +1,25 @@
+# OS or Editor files and folders.
+.DS_Store
+Thumbs.db
+.cache
+.project
+.settings
+.tmproj
+*.esproj
+nbproject
+.idea
+
+# Dreamweaver added files.
+_notes
+dwsync.xml
+
+# Folders to ignore.
+.hg
+.svn
+.CVS
+
+PHAR_BUILD_VERSION
+/cache
+/packages
+/vendor
+/*.phar
