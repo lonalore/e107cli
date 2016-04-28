@@ -45,6 +45,28 @@ class core_e107cli {
       'file' => E107CLI_BASE_PATH . '/commands/core.help.inc',
       'arguments' => array(),
       'options' => array(),
+      'aliases' => array(
+        '-h',
+        '--help',
+      ),
+    );
+
+    $commands['version'] = array(
+      'bootstrap' => E107CLI_BOOTSTRAP_BASE, // No bootstrap e107.
+      'description' => 'Show e107cli version.',
+      'examples' => array(
+        'e107cli version' => 'Print just the version number, and nothing else.',
+        'e107cli version --major' => 'Print just the major version number, and nothing else.',
+        'e107cli version --minor' => 'Print just the minor version number, and nothing else.',
+      ),
+      'callback' => 'e107cli_core_version',
+      'file' => E107CLI_BASE_PATH . '/commands/core.version.inc',
+      'arguments' => array(),
+      'options' => array(
+        'major' => 'Print just the major version number, and nothing else.',
+        'minor' => 'Print just the minor version number, and nothing else.',
+      ),
+      'aliases' => array(),
     );
 
     return $commands;

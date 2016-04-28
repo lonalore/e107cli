@@ -6,7 +6,7 @@ E107cli is a command line shell and Unix scripting interface for e107 v2.
 
 E107cli can be run in your shell by typing "e107cli" from within any e107 (v2) root directory.
 
-    $ e107cli [options] <command> [argument1] [argument2]
+    $ e107cli <command> [argument1] [argument2]
 
 Use the 'help' command to get a list of available options and commands:
 

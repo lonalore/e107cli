@@ -14,10 +14,6 @@ function e107cli_parse_args() {
   $command_args = NULL;
   $target_alias_name = NULL;
 
-  // It would be nice if commandfiles could somehow extend this list,
-  // but it is not possible. We need to parse args before we find commandfiles,
-  // because the specified options may affect how commandfiles are located.
-  // Therefore, commandfiles are loaded too late to affect arg parsing.
   // There are only a limited number of short options anyway; e107cli reserves
   // all for use by e107cli core.
   static $arg_opts = array('c', 'u', 'r', 'l', 'i');
@@ -101,11 +97,148 @@ function e107cli_parse_args() {
 }
 
 /**
+ * Matches a commands array, as returned by e107cli_get_arguments, with the
+ * current command table.
+ */
+function e107cli_parse_command() {
+  $args = e107cli_get_arguments();
+  $command = FALSE;
+
+  // Get a list of all implemented commands.
+  $implemented = e107cli_get_commands();
+  if (!empty($args) && isset($implemented[$args[0]])) {
+    $command = $implemented[$args[0]];
+    $arguments = array_slice($args, 1);
+  }
+
+  // We have found a command that matches. Set the appropriate values.
+  if ($command) {
+    // Special case. Force help command if --help option was specified.
+    if (e107cli_get_option('help')) {
+      $arguments = array($command['command']);
+      $command = $implemented['help'];
+      $command['arguments'] = $arguments;
+    }
+    else {
+      _e107cli_prepare_command($command, $arguments);
+    }
+
+    e107cli_set_command($command);
+  }
+
+  return $command;
+}
+
+/**
+ * Called by e107cli_parse_command.
+ */
+function _e107cli_prepare_command(&$command, $arguments = array()) {
+  // E107cli overloads $command['arguments']; save the argument description.
+  if (!isset($command['argument-description'])) {
+    $command['argument-description'] = $command['arguments'];
+  }
+
+  $command['arguments'] = $arguments;
+}
+
+/**
  * Get a list of all implemented commands.
  *
  * @return array
  *   Associative array of currently active command descriptors.
  */
 function e107cli_get_commands() {
+  // Include core add-on file.
+  require_once E107CLI_BASE_PATH . '/e_e107cli.php';
 
+  $addon = new core_e107cli();
+  $commands = $addon->config();
+
+  foreach ($commands as $key => $command) {
+    $command += e107cli_command_defaults($key, $command);
+
+    $commands[$key] = $command;
+
+    // For every alias, make a copy of the command and store it in the command list
+    // using the alias as a key
+    if (isset($command['aliases']) && count($command['aliases'])) {
+      foreach ($command['aliases'] as $alias) {
+        $commands[$alias] = $command;
+        $commands[$alias]['is_alias'] = TRUE;
+      }
+    }
+  }
+
+  return $commands;
+}
+
+function e107cli_command_defaults($key, $command) {
+  return array(
+    'command'     => $key,
+    'bootstrap'   => E107CLI_BOOTSTRAP_BASE,
+    'description' => '',
+    'aliases'     => array(),
+    'arguments'   => array(),
+    'options'     => array(),
+    'examples'    => array(),
+    'hidden'      => FALSE,
+    'callback'    => '',
+    'file'        => '',
+    'is_alias'    => FALSE,
+  );
+}
+
+/**
+ * Given a command record, dispatch it as if it were the original command.
+ * Executes in the currently bootstrapped site using the current option
+ * contexts.
+ * Note that e107cli_dispatch will not bootstrap any further than the current
+ * command has already bootstrapped; therefore, you should only invoke commands
+ * that have the same (or lower) bootstrap requirements.
+ *
+ * @param array $command
+ *   A full $command such as returned by e107cli_get_commands(), or a string
+ *   containing the name of the command record from e107cli_get_commands() to
+ *   call.
+ * @param array $arguments
+ *   An array of argument values.
+ *
+ * @return boolean
+ */
+function e107cli_dispatch($command, $arguments = array()) {
+  e107cli_set_command($command);
+  $return = FALSE;
+
+  if ($command) {
+    // Add arguments, if this has not already been done.
+    // (If the command was fetched from e107cli_parse_command, then you cannot
+    // provide arguments to e107cli_dispatch.)
+    if (empty($command['arguments'])) {
+      _e107cli_prepare_command($command, $arguments);
+    }
+
+    /*
+    // Test to see if any of the options in the 'cli' context are not
+    // represented in the command structure.
+    if ((_e107cli_verify_cli_options($command) === FALSE) || (_e107cli_verify_cli_arguments($command) === FALSE)) {
+      return FALSE;
+    }
+    */
+
+    // Include and validate command engines.
+    if (isset($command['file'])) {
+      if (!file_exists($command['file'])) {
+        return FALSE;
+      }
+
+      require_once $command['file'];
+    }
+
+    $opts = e107cli_get_context('E107CLI_COMMAND_OPTIONS');
+
+    // Call the callback function of the active command.
+    $return = call_user_func_array($command['callback'], array($opts, $command['arguments']));
+  }
+
+  return $return;
 }
