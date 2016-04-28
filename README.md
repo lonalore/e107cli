@@ -2,23 +2,27 @@
 
 E107cli is a command line shell and Unix scripting interface for e107 v2.
 
-## USAGE
+### USAGE
 
 E107cli can be run in your shell by typing "e107cli" from within any e107 (v2) root directory.
 
-    $ e107cli <command> [argument1] [argument2]
+    $ e107cli [options] <command> [argument1] [argument2]
 
 Use the 'help' command to get a list of available options and commands:
 
     $ e107cli help
 
-## REQUIREMENTS
+Use the 'version' command to show e107cli major version:
+
+    $ e107cli version --major
+
+### REQUIREMENTS
 
 * GIT 1.7 or greater.
 * Composer - Dependency Management
 * E107cli works on a Unix-like OS (Linux, OS X)
 
-## INSTALL - MANUAL
+### INSTALL - MANUAL
 
 * Clone this repository `git clone https://github.com/lonalore/e107cli.git` in a directory that is outside of your web root.
 * Run `composer install` to fetch dependencies.
