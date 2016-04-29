@@ -9,7 +9,20 @@
 /**
  * This is called if no command or an unknown command is entered.
  */
-function e107cli_core_help($options = array(), $args = array()) {
+function e107cli_core_help($options = array(), $arguments = array()) {
+  // e107cli help
+  if (empty($arguments)) {
+    e107cli_core_help_show_commands();
+  }
+  // e107cli help -h
+  // e107cli help --help
+  else {
+    $implemented = e107cli_get_commands();
+
+  }
+}
+
+function e107cli_core_help_show_commands() {
   $phases = _e107cli_bootstrap_phases();
   // For speed, only bootstrap up to E107CLI_BOOTSTRAP_E107+1.
   $phases = array_slice($phases, 0, E107CLI_BOOTSTRAP_E107 + 1);

@@ -28,8 +28,10 @@ function e107cli_main() {
   // Process initial global options such as --debug.
   _e107cli_bootstrap_global_options();
 
-  $return = '';
+  // Try to bootstrap.
   e107cli_bootstrap_to_phase(E107CLI_BOOTSTRAP_BASE);
+
+  $return = '';
   if (!e107cli_get_error()) {
     // Get the command.
     $command = e107cli_parse_command();
@@ -61,11 +63,10 @@ function _e107cli_bootstrap_and_dispatch() {
   if (is_array($command)) {
     e107cli_bootstrap_to_phase($command['bootstrap']);
 
-    if (e107cli_get_context('E107CLI_BOOTSTRAP_PHASE', E107CLI_BOOTSTRAP_BASE) == $command['bootstrap']) {
+    if (e107cli_get_context('E107CLI_BOOTSTRAP_PHASE', E107CLI_BOOTSTRAP_BASE) >= $command['bootstrap']) {
       $command_found = TRUE;
-      $args = e107cli_get_arguments();
       // Dispatch the command(s).
-      $return = e107cli_dispatch($command, $args);
+      $return = e107cli_dispatch($command);
       // Prevent a '1' at the end of the output.
       if ($return === TRUE) {
         $return = '';

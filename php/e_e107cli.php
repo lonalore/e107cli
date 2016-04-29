@@ -39,16 +39,13 @@ class core_e107cli {
       'bootstrap' => E107CLI_BOOTSTRAP_BASE, // No bootstrap e107.
       'description' => 'Print this help message.',
       'examples' => array(
-        'e107cli help' => 'A list of available commands, one per line.',
+        'e107cli help' => 'A list of available commands, one per line. See `e107cli help help` for more options.',
       ),
       'callback' => 'e107cli_core_help',
       'file' => E107CLI_BASE_PATH . '/commands/core.help.inc',
       'arguments' => array(),
       'options' => array(),
-      'aliases' => array(
-        '-h',
-        '--help',
-      ),
+      'aliases' => array(),
     );
 
     $commands['version'] = array(

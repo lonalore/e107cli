@@ -187,10 +187,6 @@ function e107cli_bootstrap($phase, $phase_max = FALSE) {
 
       if (function_exists($current_phase) && !e107cli_get_error()) {
         $current_phase();
-
-        // Find any command files that are available during this bootstrap
-        // phase.
-        // _e107cli_find_commandfiles($phase_index, $phase_max);
       }
 
       e107cli_set_context('E107CLI_BOOTSTRAP_PHASE', $phase_index);
@@ -276,6 +272,27 @@ function _e107cli_bootstrap_base_validate() {
 }
 
 /**
+ * Validate initial e107cli bootstrap phase.
+ */
+function _e107cli_bootstrap_e107_validate() {
+  $cwd = e107cli_cwd();
+
+  $e107_class2 = $cwd . '/class2.php';
+
+  if (!file_exists($e107_class2)) {
+    return e107cli_bootstrap_error('E107CLI_E107_CLASS2', 'Missing class2.php file.');
+  }
+
+  require_once $e107_class2;
+
+  if (!defined('e107_INIT')) {
+    return e107cli_bootstrap_error('E107CLI_E107_INIT', 'E107 initialization failed.');
+  }
+
+  return TRUE;
+}
+
+/**
  * Bootstrap to the specified phase.
  *
  * @param $max_phase_index
@@ -304,6 +321,7 @@ function e107cli_bootstrap_to_phase($max_phase_index) {
       break;
     }
   }
+
   return $result;
 }
 
