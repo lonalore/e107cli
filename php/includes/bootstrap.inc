@@ -275,19 +275,23 @@ function _e107cli_bootstrap_base_validate() {
  * Validate initial e107cli bootstrap phase.
  */
 function _e107cli_bootstrap_e107_validate() {
-  $cwd = e107cli_cwd();
+  $cwd = e107cli_cwd(); // Get working directory.
 
-  $e107_class2 = $cwd . '/class2.php';
+  $e107_class2 = realpath($cwd) . '/class2.php';
 
   if (!file_exists($e107_class2)) {
-    return e107cli_bootstrap_error('E107CLI_E107_CLASS2', 'Missing class2.php file.');
+    return e107cli_bootstrap_error('E107CLI_E107_INIT', 'Missing class2.php file.');
   }
+
+  /*
 
   require_once $e107_class2;
 
   if (!defined('e107_INIT')) {
-    return e107cli_bootstrap_error('E107CLI_E107_INIT', 'E107 initialization failed.');
+    return e107cli_bootstrap_error('E107CLI_E107_INIT', 'Init e107 failed.');
   }
+
+  */
 
   return TRUE;
 }
