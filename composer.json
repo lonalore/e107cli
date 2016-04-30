@@ -1,6 +1,6 @@
 {
   "name": "lonalore/e107cli",
-  "description": "Library that makes it easy to build console style tables.",
+  "description": "Command line shell and Unix scripting interface for e107 v2.",
   "homepage": "https://github.com/lonalore/e107cli",
   "license": "MIT",
   "minimum-stability": "stable",

@@ -277,21 +277,73 @@ function _e107cli_bootstrap_base_validate() {
 function _e107cli_bootstrap_e107_validate() {
   $cwd = e107cli_cwd(); // Get working directory.
 
-  $e107_class2 = realpath($cwd) . '/class2.php';
+  $e107_config = $cwd . '/e107_config.php';
 
-  if (!file_exists($e107_class2)) {
-    return e107cli_bootstrap_error('E107CLI_E107_INIT', 'Missing class2.php file.');
+  if (!file_exists($e107_config)) {
+    return e107cli_bootstrap_error('E107CLI_E107_INIT', 'Missing e107_config.php file.');
   }
 
-  /*
+  require_once $e107_config;
 
-  require_once $e107_class2;
-
-  if (!defined('e107_INIT')) {
-    return e107cli_bootstrap_error('E107CLI_E107_INIT', 'Init e107 failed.');
+  if (!isset($ADMIN_DIRECTORY)) {
+    return e107cli_bootstrap_error('E107CLI_E107_INIT', 'Missing e107 config variables.');
   }
 
-  */
+  $e107_version = $cwd . '/' . $ADMIN_DIRECTORY . 'ver.php';
+
+  if (!file_exists($e107_version)) {
+    return e107cli_bootstrap_error('E107CLI_E107_INIT', 'Missing e107 version file.');
+  }
+
+  define("e107_INIT", TRUE);
+  require_once $e107_version;
+
+  if (!isset($e107info['e107_version'])) {
+    return e107cli_bootstrap_error('E107CLI_E107_INIT', 'Missing e107 version.');
+  }
+
+  define("e_VERSION", $e107info['e107_version']);
+
+  if (!isset($HANDLERS_DIRECTORY)) {
+    return e107cli_bootstrap_error('E107CLI_E107_INIT', 'Missing e107 config variables.');
+  }
+
+  $core_funcs = $cwd . '/' . $HANDLERS_DIRECTORY . 'core_functions.php';
+  $e107_class = $cwd . '/' . $HANDLERS_DIRECTORY . 'e107_class.php';
+
+  if (!file_exists($core_funcs) || !file_exists($e107_class)) {
+    return e107cli_bootstrap_error('E107CLI_E107_INIT', 'Missing e107 core files.');
+  }
+
+  include_once $core_funcs;
+  include_once $e107_class;
+
+  if (!class_exists('e107')) {
+    return e107cli_bootstrap_error('E107CLI_E107_INIT', 'Missing e107 class.');
+  }
+
+  $e107 = e107::getInstance();
+
+  // Register core autoload.
+  e107::autoload_register(array('e107', 'autoload'));
+
+  if (!defined('e_HANDLER')) {
+    return e107cli_bootstrap_error('E107CLI_E107_INIT', 'Missing e107 constants.');
+  }
+
+  $session_handler = e_HANDLER . 'session_handler.php';
+
+  if (!file_exists($session_handler)) {
+    return e107cli_bootstrap_error('E107CLI_E107_INIT', 'Missing e107 session handler file.');
+  }
+
+  require_once $session_handler;
+
+  define('e_SECURITY_LEVEL', e_session::SECURITY_LEVEL_NONE);
+  define('e_COOKIE', 'e107install');
+
+  // Starts session, creates default namespace.
+  e107::getSession();
 
   return TRUE;
 }
