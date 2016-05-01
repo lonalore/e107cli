@@ -66,6 +66,19 @@ class core_e107cli {
       'aliases' => array(),
     );
 
+    $commands['e107-version'] = array(
+      'bootstrap' => E107CLI_BOOTSTRAP_E107, // Bootstrap e107.
+      'description' => 'Show e107 version.',
+      'examples' => array(
+        'e107cli e107-version' => 'Print just the version number, and nothing else.',
+      ),
+      'callback' => 'e107cli_core_e107_version',
+      'file' => E107CLI_BASE_PATH . '/commands/core.e107_version.inc',
+      'arguments' => array(),
+      'options' => array(),
+      'aliases' => array(),
+    );
+
     return $commands;
   }
 

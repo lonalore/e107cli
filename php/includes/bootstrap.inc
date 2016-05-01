@@ -106,7 +106,6 @@ function e107cli_bootstrap_prepare() {
   require_once E107CLI_BASE_PATH . '/includes/e107cli.inc';
   require_once E107CLI_BASE_PATH . '/includes/context.inc';
   require_once E107CLI_BASE_PATH . '/includes/command.inc';
-  require_once E107CLI_BASE_PATH . '/includes/output.inc';
 
   // Stash our vendor path and classloader.
   e107cli_set_context('E107CLI_VENDOR_PATH', dirname($vendor_path));
