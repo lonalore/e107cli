@@ -274,6 +274,10 @@ function _e107cli_bootstrap_base_validate() {
   return TRUE;
 }
 
+function _e107cli_bootstrap_base() {
+
+}
+
 /**
  * Validate initial e107cli bootstrap phase.
  */
@@ -349,6 +353,10 @@ function _e107cli_bootstrap_e107_validate() {
   e107::getSession();
 
   return TRUE;
+}
+
+function _e107cli_bootstrap_e107() {
+
 }
 
 /**
