@@ -223,18 +223,19 @@ function e107cli_get_commands() {
 
       foreach ($commands as $key => $command) {
         $command += e107cli_command_defaults($key, $command);
+        $commands[$key] = $command;
 
-        if (e107cli_get_context('E107CLI_BOOTSTRAP_PHASE', E107CLI_BOOTSTRAP_BASE) >= $command['bootstrap']) {
-          $commands[$key] = $command;
-
-          // For every alias, make a copy of the command and store it in the
-          // command list using the alias as a key.
-          if (isset($command['aliases']) && count($command['aliases'])) {
-            foreach ($command['aliases'] as $alias) {
-              $commands[$alias] = $command;
-              $commands[$alias]['is_alias'] = TRUE;
-            }
+        // For every alias, make a copy of the command and store it in the
+        // command list using the alias as a key.
+        if (isset($command['aliases']) && count($command['aliases'])) {
+          foreach ($command['aliases'] as $alias) {
+            $commands[$alias] = $command;
+            $commands[$alias]['is_alias'] = TRUE;
           }
+        }
+
+        if (e107cli_get_context('E107CLI_BOOTSTRAP_PHASE', -1) < $command['bootstrap']) {
+          unset($commands[$key]);
         }
       }
     }
