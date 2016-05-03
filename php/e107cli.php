@@ -33,6 +33,9 @@ function e107cli_main() {
 
   $return = '';
   if (!e107cli_get_error()) {
+    // Try to bootstrap to max.
+    e107cli_bootstrap_to_phase(E107CLI_BOOTSTRAP_E107);
+
     // Get the command.
     $command = e107cli_parse_command();
     if (is_array($command)) {

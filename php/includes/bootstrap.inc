@@ -186,6 +186,10 @@ function e107cli_bootstrap($phase, $phase_max = FALSE) {
 
       if (function_exists($current_phase) && !e107cli_get_error()) {
         $current_phase();
+
+        // Find any command files that are available during this bootstrap
+        // phase.
+        _e107cli_find_commandfiles($phase_index);
       }
 
       e107cli_set_context('E107CLI_BOOTSTRAP_PHASE', $phase_index);

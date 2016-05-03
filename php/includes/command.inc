@@ -150,43 +150,93 @@ function _e107cli_prepare_command(&$command, $arguments = array()) {
 }
 
 /**
+ * Collect a list of all available e107cli command files.
+ *
+ * Scans the following paths for e107cli command files:
+ *
+ * - Core e_e107cli.php
+ * - e_e107cli.php files belonging to enabled modules in the current e107 site.
+ * - e_e107cli.php files belonging to enabled themes in the current e107 site.
+ *
+ * @return
+ *   An associative array whose keys and values are the names of all available
+ *   command files.
+ */
+function e107cli_commandfile_list() {
+  return e107cli_get_context('E107CLI_COMMAND_FILES', array());
+}
+
+function _e107cli_find_commandfiles($phase) {
+  $searchpath = array();
+
+  switch ($phase) {
+    case E107CLI_BOOTSTRAP_BASE:
+      $searchpath['core'] = E107CLI_BASE_PATH . '/e_e107cli.php';
+      break;
+
+    case E107CLI_BOOTSTRAP_E107:
+      // TODO: scan e107 directories to find command files.
+      break;
+  }
+
+  if (count($searchpath)) {
+    $commandfiles = e107cli_get_context('E107CLI_COMMAND_FILES', array());
+
+    foreach ($searchpath as $prefix => $path) {
+      if (!isset($commandfiles[$prefix])) {
+        $commandfiles[$prefix] = $path;
+      }
+    }
+
+    e107cli_set_context('E107CLI_COMMAND_FILES', $commandfiles);
+  }
+}
+
+/**
  * Get a list of all implemented commands.
  *
  * @return array
  *   Associative array of currently active command descriptors.
  */
 function e107cli_get_commands() {
-  static $commands;
+  $commands = array();
 
-  if (!$commands) {
-    // Include core add-on file.
-    require_once E107CLI_BASE_PATH . '/e_e107cli.php';
+  $list = e107cli_commandfile_list();
+  foreach ($list as $prefix => $path) {
+    if (file_exists($path)) {
+      // Include add-on file.
+      require_once $path;
 
-    $addon = new core_e107cli();
-    $commands = $addon->config();
+      $class = $prefix . '_e107cli';
 
-    foreach ($commands as $key => $command) {
-      $command += e107cli_command_defaults($key, $command);
+      if (!class_exists($class)) {
+        continue;
+      }
 
-      if (e107cli_get_context('E107CLI_BOOTSTRAP_PHASE', E107CLI_BOOTSTRAP_BASE) >= $command['bootstrap']) {
-        $commands[$key] = $command;
+      $addon = new $class();
 
-        // For every alias, make a copy of the command and store it in the command list
-        // using the alias as a key
-        if (isset($command['aliases']) && count($command['aliases'])) {
-          foreach ($command['aliases'] as $alias) {
-            $commands[$alias] = $command;
-            $commands[$alias]['is_alias'] = TRUE;
+      if (!method_exists($addon, 'config')) {
+        continue;
+      }
+
+      $commands = $addon->config();
+
+      foreach ($commands as $key => $command) {
+        $command += e107cli_command_defaults($key, $command);
+
+        if (e107cli_get_context('E107CLI_BOOTSTRAP_PHASE', E107CLI_BOOTSTRAP_BASE) >= $command['bootstrap']) {
+          $commands[$key] = $command;
+
+          // For every alias, make a copy of the command and store it in the
+          // command list using the alias as a key.
+          if (isset($command['aliases']) && count($command['aliases'])) {
+            foreach ($command['aliases'] as $alias) {
+              $commands[$alias] = $command;
+              $commands[$alias]['is_alias'] = TRUE;
+            }
           }
         }
       }
-    }
-
-    // Try to bootstrap to e107 phase to get implemented commands.
-    e107cli_bootstrap_to_phase(E107CLI_BOOTSTRAP_E107);
-
-    if (e107cli_get_context('E107CLI_BOOTSTRAP_PHASE') == E107CLI_BOOTSTRAP_E107) {
-
     }
   }
 
@@ -195,17 +245,17 @@ function e107cli_get_commands() {
 
 function e107cli_command_defaults($key, $command) {
   return array(
-    'command'     => $key,
-    'bootstrap'   => E107CLI_BOOTSTRAP_BASE,
+    'command' => $key,
+    'bootstrap' => E107CLI_BOOTSTRAP_BASE,
     'description' => '',
-    'aliases'     => array(),
-    'arguments'   => array(),
-    'options'     => array(),
-    'examples'    => array(),
-    'hidden'      => FALSE,
-    'callback'    => '',
-    'file'        => '',
-    'is_alias'    => FALSE,
+    'aliases' => array(),
+    'arguments' => array(),
+    'options' => array(),
+    'examples' => array(),
+    'hidden' => FALSE,
+    'callback' => '',
+    'file' => '',
+    'is_alias' => FALSE,
   );
 }
 
