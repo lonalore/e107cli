@@ -379,7 +379,7 @@ function e107cli_bootstrap_to_phase($max_phase_index) {
     }
 
     if (e107cli_bootstrap_validate($phase_index)) {
-      if ($phase_index > e107cli_get_context('E107CLI_BOOTSTRAP_PHASE', E107CLI_BOOTSTRAP_BASE)) {
+      if ($phase_index > e107cli_get_context('E107CLI_BOOTSTRAP_PHASE', -1)) {
         $result = e107cli_bootstrap($phase_index, $max_phase_index);
       }
     }
