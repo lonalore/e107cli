@@ -296,17 +296,14 @@ function _e107cli_bootstrap_e107_validate() {
     return e107cli_bootstrap_error('E107CLI_E107_INIT', 'Missing class2.php file.');
   }
 
-  require_once $class2;
-
-  if (!defined('e107_INIT')) {
-    return e107cli_bootstrap_error('E107CLI_E107_INIT', 'Initialization of e107 failed.');
-  }
-
   return TRUE;
 }
 
 function _e107cli_bootstrap_e107() {
+  $cwd = e107cli_cwd(); // Get working directory.
+  $class2 = $cwd . '/class2.php';
 
+  require_once $class2;
 }
 
 /**
