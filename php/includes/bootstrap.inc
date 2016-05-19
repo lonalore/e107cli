@@ -292,7 +292,7 @@ function _e107cli_bootstrap_e107_validate() {
 
   $class2 = $cwd . '/class2.php';
 
-  if (!isset($ADMIN_DIRECTORY)) {
+  if (!file_exists($class2)) {
     return e107cli_bootstrap_error('E107CLI_E107_INIT', 'Missing class2.php file.');
   }
 
